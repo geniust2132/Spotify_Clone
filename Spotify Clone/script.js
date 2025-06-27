@@ -35,6 +35,8 @@ async function getSongs(folder) {
         }
     }
 
+    //Play the first song
+
     // show all the songs in the playlist
     let songUL = document.querySelector(".songList").getElementsByTagName("ul")[0]
     songUL.innerHTML = ""
@@ -57,6 +59,7 @@ async function getSongs(folder) {
             playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim())
         })
     })
+    return songs
 }
 
 const playMusic = (track, pause = false) => {
@@ -92,8 +95,7 @@ async function displayAlbums(params) {
             //Get the meta data of the folder
             let a = await fetch(`http://127.0.0.1:5500/Spotify%20Clone/songs/${folder}/info.json`)
             let response = await a.json();
-            console.log(response)
-            cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="cs" class="card">
+            cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card">
                         <div class="play">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
                                 fill="#000">
@@ -115,7 +117,7 @@ async function displayAlbums(params) {
     Array.from(document.getElementsByClassName("card")).forEach(e => {
         e.addEventListener("click", async item => {
             songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`)
-
+            playMusic(songs[0])
         })
     })
 
@@ -219,7 +221,21 @@ async function main() {
         currentSong.volume = parseInt(e.target.value) / 100
     })
 
+    //Add Event listener to mute the track
+    document.querySelector(".volume>img").addEventListener("click", e => {
 
+        if (e.target.src.includes("volume.svg")) {
+            e.target.src = e.target.src.replace("volume.svg", "mute.svg")
+            currentSong.volume = 0;
+            document.querySelector(".range").getElementsByTagName("input")[0].value = 0;
+        }
+        else {
+            e.target.src = e.target.src.replace("mute.svg", "volume.svg")
+            currentSong.volume = .10;
+            document.querySelector(".range").getElementsByTagName("input")[0].value = 10;
+
+        }
+    })
 
 }
 main()
